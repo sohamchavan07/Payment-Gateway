@@ -1,7 +1,7 @@
 class PaymentsController < ApplicationController
     def new
     end
-  
+
     def create_payment_intent
       amount = params[:amount]
       currency = params[:currency] || "inr"
@@ -30,20 +30,19 @@ class PaymentsController < ApplicationController
 
     def create_checkout_session
       session = Stripe::Checkout::Session.create(
-        payment_method_types: ['card'],
-        mode: 'payment',
-        line_items: [{
+        payment_method_types: [ "card" ],
+        mode: "payment",
+        line_items: [ {
           price_data: {
-            currency: 'usd',
-            product_data: { name: 'Test Product' },
-            unit_amount: 2000, # $20.00
+            currency: "usd",
+            product_data: { name: "Test Product" },
+            unit_amount: 2000 # $20.00
           },
-          quantity: 1,
-        }],
+          quantity: 1
+        } ],
         success_url: root_url + "?success=true",
         cancel_url: root_url + "?canceled=true"
       )
       redirect_to session.url, allow_other_host: true
     end
-  end
-  
+end
