@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  email: MyString
+  amount_cents: 1
+  currency: MyString
+  status: MyString
+  stripe_session_id: MyString
+  line_items: 
+  metadata: 
+
+two:
+  email: MyString
+  amount_cents: 1
+  currency: MyString
+  status: MyString
+  stripe_session_id: MyString
+  line_items: 
+  metadata: 
