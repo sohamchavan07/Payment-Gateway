@@ -1,7 +1,7 @@
 class CreateOrders < ActiveRecord::Migration[8.0]
   def change
     create_table :orders do |t|
-      t.string :email
+      t.string :full_name
       t.integer :amount_cents
       t.string :currency
       t.string :status

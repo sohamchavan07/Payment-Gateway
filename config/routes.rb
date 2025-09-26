@@ -11,9 +11,20 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  root "payments#new"
+  root "workshop#new"
+
+  get "/workshop", to: "workshop#new"
+  get "/payments/new", to: "payments#new", as: :new_payment
 
   post "/create-checkout-session", to: "payments#create_checkout_session"
   post "/payment_intents", to: "payments#create_payment_intent"
   post "/webhooks/stripe", to: "webhooks#stripe"
+
+  namespace :api do
+    namespace :v1 do
+      namespace :checkout do
+        post "/create-order", to: "orders#create"
+      end
+    end
+  end
 end

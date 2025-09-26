@@ -1,40 +1,26 @@
-<style>
-  .pg-container { max-width: 640px; margin: 24px auto; padding: 16px; }
-  .pg-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-  .pg-title { margin: 0 0 16px; font-size: 22px; line-height: 28px; }
-  .pg-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-  @media (min-width: 600px) { .pg-grid-2 { grid-template-columns: 1fr 1fr; } }
-  .pg-field { display: flex; flex-direction: column; gap: 6px; }
-  .pg-label { font-size: 14px; color: #374151; }
-  .pg-input { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; }
-  .pg-help { font-size: 12px; color: #6b7280; }
-  .pg-card-element { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fafafa; }
-  .pg-actions { margin-top: 8px; display: flex; align-items: center; gap: 10px; }
-  .pg-btn { appearance: none; border: none; border-radius: 8px; background: #0ea5e9; color: #fff; font-weight: 600; padding: 10px 14px; cursor: pointer; }
-  .pg-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
-  .pg-msg { margin-top: 8px; font-size: 14px; }
-  .pg-error { color: #dc2626; }
-  .pg-success { color: #16a34a; }
-  .pg-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.6); border-top-color: #ffffff; border-radius: 9999px; display: inline-block; animation: pg-spin 0.9s linear infinite; }
-  @keyframes pg-spin { to { transform: rotate(360deg); } }
-</style>
+ 
 
 <div class="pg-container">
   <div class="pg-card">
     <h2 class="pg-title">Stripe PaymentIntent Demo</h2>
 
-    <form id="payment-form" novalidate>
+    <form id="payment-form" novalidate aria-describedby="error success">
       <div class="pg-grid pg-grid-2">
         <div class="pg-field">
-          <label class="pg-label" for="amount">Amount (in paise/cents)</label>
-          <input class="pg-input" id="amount" name="amount" type="number" inputmode="numeric" min="1" step="1" value="49900" required />
-          <div class="pg-help">Example: 49900 = ₹499.00</div>
+          <label class="pg-label" for="amount">Amount (in rupees)</label>
+          <input class="pg-input" id="amount" name="amount" type="number" inputmode="decimal" min="1" step="0.01" value="<%= (params[:amount].presence || 199).to_f.round(2) %>" placeholder="199.00" required aria-required="true" />
+          <div class="pg-help">Enter rupees, e.g. 199.00 → will charge ₹199.00</div>
         </div>
 
         <div class="pg-field">
           <label class="pg-label" for="currency">Currency</label>
-          <input class="pg-input" id="currency" name="currency" type="text" value="INR" maxlength="3" autocapitalize="characters" required />
+          <input class="pg-input" id="currency" name="currency" type="text" value="<%= (params[:currency] || 'INR').to_s.upcase %>" maxlength="3" autocapitalize="characters" required />
         </div>
+
+      <div class="pg-field">
+        <label class="pg-label" for="full_name">Full name</label>
+        <input class="pg-input" id="full_name" name="full_name" type="text" value="<%= params[:full_name] %>" placeholder="Jane Doe" required />
+      </div>
 
       <div class="pg-field" style="margin-top:12px;">
         <label class="pg-label" for="card-element">Card details</label>
@@ -42,7 +28,7 @@
       </div>
 
       <div class="pg-actions">
-        <button id="pay-button" type="submit" class="pg-btn">
+        <button id="pay-button" type="submit" class="pg-btn" aria-live="polite">
           <span class="pg-btn-text">Pay</span>
           <span class="pg-btn-loading" style="display:none;"><span class="pg-spinner"></span></span>
         </button>
@@ -55,9 +41,10 @@
       <input type="hidden" id="stripe-publishable-key" value="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>" />
       <input type="hidden" id="payment-intents-url" value="<%= url_for('/payment_intents') %>" />
       <input type="hidden" id="csrf-token" value="<%= form_authenticity_token %>" />
+      <input type="hidden" id="order_id" value="<%= params[:order_id] %>" />
       <%= csrf_meta_tags %>
     </form>
-  </div>
+  </div> 
   
 </div>
 
@@ -65,6 +52,11 @@
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
     const publishableKey = document.getElementById('stripe-publishable-key').value;
+    if (!publishableKey) {
+      const err = document.getElementById('error');
+      err.textContent = 'Stripe publishable key is not configured.';
+      return;
+    }
     const stripe = Stripe(publishableKey);
     const elements = stripe.elements();
     const card = elements.create('card');
@@ -91,13 +83,39 @@
       e.preventDefault();
       errorEl.textContent = '';
       successEl.textContent = '';
+      setLoading(true, 'Validating...');
+
+      // Basic client-side validation
+      const amountRupeesStr = document.getElementById('amount').value;
+      const currencyStr = (document.getElementById('currency').value || '').toUpperCase().trim();
+      const fullNameStr = (document.getElementById('full_name').value || '').trim();
+
+      const amountRupees = parseFloat(amountRupeesStr);
+      if (!Number.isFinite(amountRupees) || amountRupees <= 0) {
+        setLoading(false);
+        errorEl.textContent = 'Please enter a valid amount in rupees.';
+        return;
+      }
+      if (!/^[A-Z]{3}$/.test(currencyStr)) {
+        setLoading(false);
+        errorEl.textContent = 'Please enter a valid 3-letter currency code.';
+        return;
+      }
+      if (fullNameStr.length < 2) {
+        setLoading(false);
+        errorEl.textContent = 'Please enter your full name.';
+        return;
+      }
+
       setLoading(true, 'Creating PaymentIntent...');
 
+      // Convert rupees to paise (integer) for the backend/Stripe
+      const amountPaise = Math.round(amountRupees * 100);
       const payload = {
-        amount: document.getElementById('amount').value,
-        currency: document.getElementById('currency').value,
+        amount: amountPaise,
+        currency: currencyStr,
         order_id: document.getElementById('order_id').value,
-        customer_email: document.getElementById('customer_email').value
+        full_name: fullNameStr
       };
 
       let clientSecret;
@@ -117,7 +135,7 @@
         clientSecret = data.client_secret;
       } catch (err) {
         setLoading(false);
-        errorEl.textContent = err.message;
+        errorEl.textContent = err.message || 'Failed to create PaymentIntent';
         return;
       }
 
@@ -127,7 +145,7 @@
         result = await stripe.confirmCardPayment(clientSecret, {
           payment_method: {
             card: card,
-            billing_details: { email: payload.customer_email }
+            billing_details: { name: payload.full_name }
           }
         });
       } catch (err) {

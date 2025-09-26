@@ -8,3 +8,41 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+.pg-container { max-width: 640px; margin: 24px auto; padding: 16px; }
+.pg-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.pg-title { margin: 0 0 16px; font-size: 22px; line-height: 28px; }
+.pg-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 600px) { .pg-grid-2 { grid-template-columns: 1fr 1fr; } }
+.pg-field { display: flex; flex-direction: column; gap: 6px; }
+.pg-label { font-size: 14px; color: #374151; }
+.pg-input { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; }
+.pg-help { font-size: 12px; color: #6b7280; }
+.pg-card-element { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fafafa; }
+.pg-actions { margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+.pg-btn { appearance: none; border: none; border-radius: 8px; background: #0ea5e9; color: #fff; font-weight: 600; padding: 10px 14px; cursor: pointer; }
+.pg-btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+.pg-msg { margin-top: 8px; font-size: 14px; }
+.pg-error { color: #dc2626; }
+.pg-success { color: #16a34a; }
+.pg-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.6); border-top-color: #ffffff; border-radius: 9999px; display: inline-block; animation: pg-spin 0.9s linear infinite; }
+@keyframes pg-spin { to { transform: rotate(360deg); } }
+
+/* Workshop page styles (lightweight) */
+.workshop-hero{position:relative;overflow:hidden;border:2px solid #000;border-radius:8px;background:linear-gradient(135deg,#b6f0ff,#c8ffe0);padding:24px;margin:24px auto;max-width:980px}
+.ws-badge{position:absolute;top:16px;right:16px;background:#ffd100;color:#000;font-weight:800;border-radius:50% 8px 50% 50%;padding:12px 16px;border:2px solid #000;text-align:center}
+.ws-badge span{display:block;font-size:12px;font-weight:700}
+.ws-content{max-width:640px}
+.ws-brand{font-weight:900;letter-spacing:.5px}
+.ws-subbrand{font-weight:600;color:#111}
+.ws-title{font-size:48px;line-height:1.05;margin:12px 0 10px 0}
+.ws-strip{background:#ccff66;border-left:6px solid #111;display:inline-block;padding:8px 12px;font-weight:700;margin:8px 0 16px 0}
+.ws-details{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap}
+.ws-when-title{font-weight:800}
+.ws-when-time{color:#333}
+.ws-pay-btn{background:#111;color:#fff;border:2px solid #000;border-radius:8px;padding:10px 16px;text-decoration:none;font-weight:800;display:inline-block}
+.ws-note{font-size:12px;margin-top:6px}
+.ws-addr{margin:16px 0}
+.ws-footer{display:flex;justify-content:space-between;gap:16px;border-top:2px solid #111;padding-top:8px;margin-top:16px}
+.ws-footer a{color:#0b3; font-weight:700}
+.ws-robot{position:absolute;bottom:-10px;right:-20px;width:240px;height:240px;background:radial-gradient(circle at 40% 40%,#c6f0ff,#6ec1ff);border:2px solid #000;border-radius:50%}

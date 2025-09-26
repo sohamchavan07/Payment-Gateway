@@ -6,7 +6,7 @@ class PaymentsController < ApplicationController
       amount = params[:amount]
       currency = params[:currency] || "inr"
       order_id = params[:order_id]
-      customer_email = params[:customer_email]
+      full_name = params[:full_name]
 
       if amount.blank? || order_id.blank?
         render json: { error: "amount and order_id are required" }, status: :unprocessable_entity
@@ -17,8 +17,7 @@ class PaymentsController < ApplicationController
         intent = Stripe::PaymentIntent.create(
           amount: amount.to_i,
           currency: currency.to_s.downcase,
-          receipt_email: customer_email,
-          metadata: { order_id: order_id }
+          metadata: { order_id: order_id, full_name: full_name }
         )
       rescue Stripe::StripeError => e
         render json: { error: e.message }, status: :bad_request

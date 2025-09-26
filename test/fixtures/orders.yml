@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  email: MyString
+  full_name: MyString
   amount_cents: 1
   currency: MyString
   status: MyString
@@ -10,7 +10,7 @@ one:
   metadata: 
 
 two:
-  email: MyString
+  full_name: MyString
   amount_cents: 1
   currency: MyString
   status: MyString
