@@ -5,7 +5,7 @@ gem "rails", "~> 8.0.2", ">= 8.0.2.1"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Databases
-gem "pg", "~> 1.5"
+gem "pg", "~> 1.6"
 
 group :production do
 end
