@@ -1,60 +1,166 @@
- 
+<div class="payment-container">
+  <div class="payment-card">
+    <!-- Header Section -->
+    <div class="payment-header">
+      <div class="payment-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="payment-title">Secure Payment</h1>
+      <p class="payment-subtitle">Complete your transaction safely and securely</p>
+    </div>
 
-<div class="pg-container">
-  <div class="pg-card">
-    <h2 class="pg-title">Stripe PaymentIntent Demo</h2>
+    <!-- Security Badge -->
+    <div class="security-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 22S2 18 2 12V5L12 2L22 5V12C22 18 12 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>256-bit SSL encryption</span>
+    </div>
 
     <form id="payment-form" novalidate aria-describedby="error success">
-      <div class="pg-grid pg-grid-2">
-        <div class="pg-field">
-          <label class="pg-label" for="amount">Amount (in rupees)</label>
-          <input class="pg-input" id="amount" name="amount" type="number" inputmode="decimal" min="1" step="0.01" value="<%= (params[:amount].presence || 199).to_f.round(2) %>" placeholder="199.00" required aria-required="true" />
-          <div class="pg-help">Enter rupees, e.g. 199.00 → will charge ₹199.00</div>
-        </div>
+      <!-- Amount Section -->
+      <div class="form-section">
+        <h3 class="section-title">Payment Details</h3>
+        <div class="form-grid">
+          <div class="form-field">
+            <label class="form-label" for="amount">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1V23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6312 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6312 13.6815 18 14.5717 18 15.5C18 16.4283 17.6312 17.3185 16.9749 17.9749C16.3185 18.6312 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Amount
+            </label>
+            <div class="input-group">
+              <span class="currency-symbol">₹</span>
+              <input class="form-input" id="amount" name="amount" type="number" inputmode="decimal" min="1" step="0.01" value="<%= (params[:amount].presence || 199).to_f.round(2) %>" placeholder="199.00" required aria-required="true" />
+            </div>
+            <div class="form-help">Enter amount in Indian Rupees</div>
+          </div>
 
-        <div class="pg-field">
-          <label class="pg-label" for="currency">Currency</label>
-          <input class="pg-input" id="currency" name="currency" type="text" value="<%= (params[:currency] || 'INR').to_s.upcase %>" maxlength="3" autocapitalize="characters" required />
+          <div class="form-field">
+            <label class="form-label" for="currency">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Currency
+            </label>
+            <input class="form-input currency-input" id="currency" name="currency" type="text" value="<%= (params[:currency] || 'INR').to_s.upcase %>" maxlength="3" autocapitalize="characters" required />
+          </div>
         </div>
-
-      <div class="pg-field">
-        <label class="pg-label" for="full_name">Full name</label>
-        <input class="pg-input" id="full_name" name="full_name" type="text" value="<%= params[:full_name] %>" placeholder="Jane Doe" required />
       </div>
 
-      <div class="pg-field" style="margin-top:12px;">
-        <label class="pg-label" for="card-element">Card details</label>
-        <div id="card-element" class="pg-card-element"></div>
+      <!-- Personal Information -->
+      <div class="form-section">
+        <h3 class="section-title">Personal Information</h3>
+        <div class="form-field">
+          <label class="form-label" for="full_name">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Full Name
+          </label>
+          <input class="form-input" id="full_name" name="full_name" type="text" value="<%= params[:full_name] %>" placeholder="Enter your full name" required />
+        </div>
       </div>
 
-      <div class="pg-actions">
-        <button id="pay-button" type="submit" class="pg-btn" aria-live="polite">
-          <span class="pg-btn-text">Pay</span>
-          <span class="pg-btn-loading" style="display:none;"><span class="pg-spinner"></span></span>
+      <!-- Card Details -->
+      <div class="form-section">
+        <h3 class="section-title">Card Information</h3>
+        <div class="form-field">
+          <label class="form-label" id="card-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+              <line x1="1" y1="10" x2="23" y2="10" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Card Details
+          </label>
+          <div id="card-element" class="card-element" aria-labelledby="card-label"></div>
+          <div class="card-brands">
+            <span class="card-brand">Visa</span>
+            <span class="card-brand">Mastercard</span>
+            <span class="card-brand">American Express</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Button -->
+      <div class="payment-actions">
+        <button id="pay-button" type="submit" class="payment-btn" aria-live="polite">
+          <span class="btn-content">
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            <span class="btn-text">Complete Payment</span>
+          </span>
+          <span class="btn-loading" style="display:none;">
+            <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+            <span class="loading-text"></span>
+          </span>
         </button>
-        <span id="message" class="pg-msg" aria-live="polite"></span>
+        
+        <div id="message" class="payment-message" aria-live="polite"></div>
       </div>
 
-      <div id="error" class="pg-msg pg-error" role="alert" aria-live="assertive"></div>
-      <div id="success" class="pg-msg pg-success" aria-live="polite"></div>
+      <!-- Status Messages -->
+      <div id="error" class="status-message error-message" role="alert" aria-live="assertive" style="display:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
+          <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span class="message-text"></span>
+      </div>
+      
+      <div id="success" class="status-message success-message" aria-live="polite" style="display:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 11.08V12A10 10 0 1 1 5.93 5.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="message-text"></span>
+      </div>
 
+      <!-- Hidden Fields -->
       <input type="hidden" id="stripe-publishable-key" value="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>" />
       <input type="hidden" id="payment-intents-url" value="<%= url_for('/payment_intents') %>" />
       <input type="hidden" id="csrf-token" value="<%= form_authenticity_token %>" />
       <input type="hidden" id="order_id" value="<%= params[:order_id] %>" />
       <%= csrf_meta_tags %>
     </form>
-  </div> 
-  
+  </div>
 </div>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
-    const publishableKey = document.getElementById('stripe-publishable-key').value;
+    const publishableKeyEl = document.getElementById('stripe-publishable-key');
+    const errorEl = document.getElementById('error');
+    
+    if (!publishableKeyEl || !errorEl) {
+      console.error('Required DOM elements not found');
+      return;
+    }
+    
+    const publishableKey = publishableKeyEl.value;
     if (!publishableKey) {
-      const err = document.getElementById('error');
-      err.textContent = 'Stripe publishable key is not configured.';
+      const messageText = errorEl.querySelector('.message-text');
+      if (messageText) {
+        messageText.textContent = 'Stripe publishable key is not configured.';
+        errorEl.style.display = 'flex';
+      }
       return;
     }
     const stripe = Stripe(publishableKey);
@@ -64,25 +170,41 @@
 
     const form = document.getElementById('payment-form');
     const message = document.getElementById('message');
-    const errorEl = document.getElementById('error');
     const successEl = document.getElementById('success');
     const payBtn = document.getElementById('pay-button');
-    const btnText = payBtn.querySelector('.pg-btn-text');
-    const btnLoading = payBtn.querySelector('.pg-btn-loading');
-    const intentsUrl = document.getElementById('payment-intents-url').value;
-    const csrfToken = document.getElementById('csrf-token').value;
+    
+    if (!form || !message || !successEl || !payBtn) {
+      console.error('Required form elements not found');
+      return;
+    }
+    
+    const btnContent = payBtn.querySelector('.btn-content');
+    const btnLoading = payBtn.querySelector('.btn-loading');
+    const intentsUrlEl = document.getElementById('payment-intents-url');
+    const csrfTokenEl = document.getElementById('csrf-token');
+    
+    if (!btnContent || !btnLoading || !intentsUrlEl || !csrfTokenEl) {
+      console.error('Required button or hidden elements not found');
+      return;
+    }
+    
+    const intentsUrl = intentsUrlEl.value;
+    const csrfToken = csrfTokenEl.value;
 
     function setLoading(loading, label = 'Processing...') {
       payBtn.disabled = loading;
-      btnText.style.display = loading ? 'none' : 'inline';
-      btnLoading.style.display = loading ? 'inline' : 'none';
+      btnContent.style.display = loading ? 'none' : 'flex';
+      btnLoading.style.display = loading ? 'flex' : 'none';
+      if (loading) {
+        btnLoading.querySelector('.loading-text').textContent = label;
+      }
       message.textContent = loading ? label : '';
     }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errorEl.textContent = '';
-      successEl.textContent = '';
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
       setLoading(true, 'Validating...');
 
       // Basic client-side validation
@@ -93,17 +215,29 @@
       const amountRupees = parseFloat(amountRupeesStr);
       if (!Number.isFinite(amountRupees) || amountRupees <= 0) {
         setLoading(false);
-        errorEl.textContent = 'Please enter a valid amount in rupees.';
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = 'Please enter a valid amount in rupees.';
+          errorEl.style.display = 'flex';
+        }
         return;
       }
       if (!/^[A-Z]{3}$/.test(currencyStr)) {
         setLoading(false);
-        errorEl.textContent = 'Please enter a valid 3-letter currency code.';
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = 'Please enter a valid 3-letter currency code.';
+          errorEl.style.display = 'flex';
+        }
         return;
       }
       if (fullNameStr.length < 2) {
         setLoading(false);
-        errorEl.textContent = 'Please enter your full name.';
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = 'Please enter your full name.';
+          errorEl.style.display = 'flex';
+        }
         return;
       }
 
@@ -135,7 +269,11 @@
         clientSecret = data.client_secret;
       } catch (err) {
         setLoading(false);
-        errorEl.textContent = err.message || 'Failed to create PaymentIntent';
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = err.message || 'Failed to create PaymentIntent';
+          errorEl.style.display = 'flex';
+        }
         return;
       }
 
@@ -150,18 +288,34 @@
         });
       } catch (err) {
         setLoading(false);
-        errorEl.textContent = err.message || 'Payment failed';
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = err.message || 'Payment failed';
+          errorEl.style.display = 'flex';
+        }
         return;
       }
 
       setLoading(false);
       const { error, paymentIntent } = result || {};
       if (error) {
-        errorEl.textContent = error.message || 'Payment failed';
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = error.message || 'Payment failed';
+          errorEl.style.display = 'flex';
+        }
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        successEl.textContent = 'Payment succeeded!';
+        const successMessageText = successEl.querySelector('.message-text');
+        if (successMessageText) {
+          successMessageText.textContent = 'Payment succeeded!';
+          successEl.style.display = 'flex';
+        }
       } else {
-        errorEl.textContent = 'Payment status: ' + (paymentIntent && paymentIntent.status);
+        const messageText = errorEl.querySelector('.message-text');
+        if (messageText) {
+          messageText.textContent = 'Payment status: ' + (paymentIntent && paymentIntent.status);
+          errorEl.style.display = 'flex';
+        }
       }
     });
   });
