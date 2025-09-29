@@ -1,0 +1,116 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ci:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      # Use the service hostname `postgres` for connections from the job to the container
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: soham_test
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/soham_test
+      CI: true
+    services:
+      postgres:
+        image: postgres:15
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: soham_test
+        options: >-
+          --health-cmd="pg_isready -U postgres" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: payment_gateway
+          
+
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install -y libpq-dev
+
+      - name: Bundle install
+        working-directory: payment_gateway
+        run: bundle install --jobs 4 --retry 3
+
+      - name: DB setup
+        working-directory: payment_gateway
+        run: |
+          bin/rails db:test:prepare
+
+      - name: RSpec
+        working-directory: payment_gateway
+        run: |
+          bin/rails spec
+
+      - name: RuboCop
+        if: always()
+        working-directory: payment_gateway
+        run: |
+          bundle exec rubocop -V || true
+          bundle exec rubocop || (echo "RuboCop violations found" && exit 1)
+
+      - name: Brakeman
+        if: always()
+        working-directory: payment_gateway
+        run: |
+          bundle exec brakeman -q -w2
+
+  cd:
+    name: Deploy with Kamal
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: payment_gateway
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: payment_gateway
+          
+
+      - name: Install Kamal
+        run: bundle install --with production
+
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.KAMAL_SSH_PRIVATE_KEY }}
+
+      - name: Docker login
+        run: |
+          echo "${{ secrets.KAMAL_REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.KAMAL_REGISTRY_USERNAME }} --password-stdin ${{ secrets.KAMAL_REGISTRY_SERVER || 'docker.io' }}
+
+      - name: Deploy
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+        run: |
+          bin/kamal deploy
+
