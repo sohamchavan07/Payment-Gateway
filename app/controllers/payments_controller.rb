@@ -8,17 +8,21 @@ class PaymentsController < ApplicationController
       order_id = params[:order_id]
       full_name = params[:full_name]
 
-      if amount.blank? || order_id.blank?
-        render json: { error: "amount and order_id are required" }, status: :unprocessable_entity
+    # Validate amount only; order_id is optional metadata
+    if amount.blank?
+      render json: { error: "amount is required" }, status: :unprocessable_entity
         return
       end
 
       begin
-        intent = Stripe::PaymentIntent.create(
-          amount: amount.to_i,
-          currency: currency.to_s.downcase,
-          metadata: { order_id: order_id, full_name: full_name }
-        )
+      metadata = { full_name: full_name }
+      metadata[:order_id] = order_id if order_id.present?
+
+      intent = Stripe::PaymentIntent.create(
+        amount: amount.to_i,
+        currency: currency.to_s.downcase,
+        metadata: metadata
+      )
       rescue Stripe::StripeError => e
         render json: { error: e.message }, status: :bad_request
         return

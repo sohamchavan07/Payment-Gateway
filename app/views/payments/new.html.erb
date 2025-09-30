@@ -74,14 +74,14 @@
       <div class="form-section">
         <h3 class="section-title">Card Information</h3>
         <div class="form-field">
-          <label class="form-label" id="card-label">
+          <div class="form-label" id="card-label">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="1" y="4" width="22" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
               <line x1="1" y1="10" x2="23" y2="10" stroke="currentColor" stroke-width="2"/>
             </svg>
             Card Details
-          </label>
-          <div id="card-element" class="card-element" aria-labelledby="card-label"></div>
+          </div>
+          <div class="card-element" data-card-mount aria-labelledby="card-label"></div>
           <div class="card-brands">
             <span class="card-brand">Visa</span>
             <span class="card-brand">Mastercard</span>
@@ -101,7 +101,7 @@
             </svg>
             <span class="btn-text">Complete Payment</span>
           </span>
-          <span class="btn-loading" style="display:none;">
+          <span class="btn-loading">
             <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
                 <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
@@ -116,7 +116,7 @@
       </div>
 
       <!-- Status Messages -->
-      <div id="error" class="status-message error-message" role="alert" aria-live="assertive" style="display:none;">
+      <div id="error" class="status-message error-message" role="alert" aria-live="assertive">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
           <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
@@ -125,7 +125,7 @@
         <span class="message-text"></span>
       </div>
       
-      <div id="success" class="status-message success-message" aria-live="polite" style="display:none;">
+      <div id="success" class="status-message success-message" aria-live="polite">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M22 11.08V12A10 10 0 1 1 5.93 5.93" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <polyline points="22,4 12,14.01 9,11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -143,180 +143,249 @@
   </div>
 </div>
 
-<script src="https://js.stripe.com/v3/"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    const publishableKeyEl = document.getElementById('stripe-publishable-key');
-    const errorEl = document.getElementById('error');
-    
-    if (!publishableKeyEl || !errorEl) {
-      console.error('Required DOM elements not found');
-      return;
-    }
-    
-    const publishableKey = publishableKeyEl.value;
-    if (!publishableKey) {
-      const messageText = errorEl.querySelector('.message-text');
-      if (messageText) {
-        messageText.textContent = 'Stripe publishable key is not configured.';
-        errorEl.style.display = 'flex';
-      }
-      return;
-    }
-    const stripe = Stripe(publishableKey);
-    const elements = stripe.elements();
-    const card = elements.create('card');
-    card.mount('#card-element');
-
-    const form = document.getElementById('payment-form');
-    const message = document.getElementById('message');
-    const successEl = document.getElementById('success');
-    const payBtn = document.getElementById('pay-button');
-    
-    if (!form || !message || !successEl || !payBtn) {
-      console.error('Required form elements not found');
-      return;
-    }
-    
-    const btnContent = payBtn.querySelector('.btn-content');
-    const btnLoading = payBtn.querySelector('.btn-loading');
-    const intentsUrlEl = document.getElementById('payment-intents-url');
-    const csrfTokenEl = document.getElementById('csrf-token');
-    
-    if (!btnContent || !btnLoading || !intentsUrlEl || !csrfTokenEl) {
-      console.error('Required button or hidden elements not found');
-      return;
-    }
-    
-    const intentsUrl = intentsUrlEl.value;
-    const csrfToken = csrfTokenEl.value;
-
-    function setLoading(loading, label = 'Processing...') {
-      payBtn.disabled = loading;
-      btnContent.style.display = loading ? 'none' : 'flex';
-      btnLoading.style.display = loading ? 'flex' : 'none';
-      if (loading) {
-        btnLoading.querySelector('.loading-text').textContent = label;
-      }
-      message.textContent = loading ? label : '';
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorEl.style.display = 'none';
-      successEl.style.display = 'none';
-      setLoading(true, 'Validating...');
-
-      // Basic client-side validation
-      const amountRupeesStr = document.getElementById('amount').value;
-      const currencyStr = (document.getElementById('currency').value || '').toUpperCase().trim();
-      const fullNameStr = (document.getElementById('full_name').value || '').trim();
-
-      const amountRupees = parseFloat(amountRupeesStr);
-      if (!Number.isFinite(amountRupees) || amountRupees <= 0) {
-        setLoading(false);
-        const messageText = errorEl.querySelector('.message-text');
-        if (messageText) {
-          messageText.textContent = 'Please enter a valid amount in rupees.';
-          errorEl.style.display = 'flex';
-        }
-        return;
-      }
-      if (!/^[A-Z]{3}$/.test(currencyStr)) {
-        setLoading(false);
-        const messageText = errorEl.querySelector('.message-text');
-        if (messageText) {
-          messageText.textContent = 'Please enter a valid 3-letter currency code.';
-          errorEl.style.display = 'flex';
-        }
-        return;
-      }
-      if (fullNameStr.length < 2) {
-        setLoading(false);
-        const messageText = errorEl.querySelector('.message-text');
-        if (messageText) {
-          messageText.textContent = 'Please enter your full name.';
-          errorEl.style.display = 'flex';
-        }
-        return;
-      }
-
-      setLoading(true, 'Creating PaymentIntent...');
-
-      // Convert rupees to paise (integer) for the backend/Stripe
-      const amountPaise = Math.round(amountRupees * 100);
-      const payload = {
-        amount: amountPaise,
-        currency: currencyStr,
-        
-        full_name: fullNameStr
+  (function() {
+    function once(fn) {
+      let done = false;
+      return function() {
+        if (done) return;
+        done = true;
+        return fn.apply(this, arguments);
       };
+    }
 
-      let clientSecret;
+    function injectStripeIfMissing() {
+      let tag = document.getElementById('stripe-js');
+      if (!tag) {
+        tag = document.createElement('script');
+        tag.id = 'stripe-js';
+        tag.src = 'https://js.stripe.com/v3/';
+        document.head.appendChild(tag);
+      }
+      return new Promise((resolve, reject) => {
+        if (typeof Stripe !== 'undefined') return resolve();
+        tag.addEventListener('load', () => resolve());
+        tag.addEventListener('error', () => reject(new Error('Failed to load Stripe.js')));
+        // Fallback timer in case load already happened
+        setTimeout(() => {
+          if (typeof Stripe !== 'undefined') resolve();
+        }, 50);
+      });
+    }
+
+    async function waitForStripe(timeoutMs = 5000) {
+      const start = Date.now();
+      while (typeof Stripe === 'undefined') {
+        await new Promise(r => setTimeout(r, 25));
+        if (Date.now() - start > timeoutMs) throw new Error('Stripe.js failed to load in time');
+      }
+    }
+
+    const init = once(async function initStripePayment() {
       try {
-        const res = await fetch(intentsUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': csrfToken
-          },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to create PaymentIntent');
-        }
-        clientSecret = data.client_secret;
-      } catch (err) {
-        setLoading(false);
+        await injectStripeIfMissing();
+        await waitForStripe();
+      } catch (e) {
+        console.error(e);
+        return;
+      }
+
+      const publishableKeyEl = document.getElementById('stripe-publishable-key');
+      const errorEl = document.getElementById('error');
+      if (!publishableKeyEl || !errorEl) {
+        console.error('Required DOM elements not found');
+        return;
+      }
+
+      const publishableKey = publishableKeyEl.value;
+      if (!publishableKey) {
         const messageText = errorEl.querySelector('.message-text');
         if (messageText) {
-          messageText.textContent = err.message || 'Failed to create PaymentIntent';
+          messageText.textContent = 'Stripe publishable key is not configured.';
           errorEl.style.display = 'flex';
         }
         return;
       }
 
-      message.textContent = 'Confirming payment...';
-      let result;
-      try {
-        result = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: card,
-            billing_details: { name: payload.full_name }
+      // Reuse existing instances across Turbo visits
+      const stripe = window.__stripeInstance || (window.__stripeInstance = Stripe(publishableKey));
+      const elements = window.__stripeElements || (window.__stripeElements = stripe.elements());
+      let card = window.__stripeCard;
+      if (!card) {
+        card = window.__stripeCard = elements.create('card');
+      }
+
+      const cardMountEl = document.querySelector('[data-card-mount]');
+      if (!cardMountEl) {
+        console.error('Card mount element not found');
+        return;
+      }
+      if (!card._mounted) {
+        card.mount(cardMountEl);
+        card._mounted = true;
+      }
+
+      const form = document.getElementById('payment-form');
+      const message = document.getElementById('message');
+      const successEl = document.getElementById('success');
+      const payBtn = document.getElementById('pay-button');
+      if (!form || !message || !successEl || !payBtn) {
+        console.error('Required form elements not found');
+        return;
+      }
+
+      const btnContent = payBtn.querySelector('.btn-content');
+      const btnLoading = payBtn.querySelector('.btn-loading');
+      const intentsUrlEl = document.getElementById('payment-intents-url');
+      const csrfTokenEl = document.getElementById('csrf-token');
+      if (!btnContent || !btnLoading || !intentsUrlEl || !csrfTokenEl) {
+        console.error('Required button or hidden elements not found');
+        return;
+      }
+
+      const intentsUrl = intentsUrlEl.value;
+      const csrfToken = csrfTokenEl.value;
+
+      function setLoading(loading, label = 'Processing...') {
+        payBtn.disabled = loading;
+        btnContent.style.display = loading ? 'none' : 'flex';
+        btnLoading.style.display = loading ? 'flex' : 'none';
+        if (loading) {
+          btnLoading.querySelector('.loading-text').textContent = label;
+        }
+        message.textContent = loading ? label : '';
+      }
+
+      if (!form.__stripeSubmitBound) {
+        form.__stripeSubmitBound = true;
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          errorEl.style.display = 'none';
+          successEl.style.display = 'none';
+          setLoading(true, 'Validating...');
+
+          const amountRupeesStr = document.getElementById('amount').value;
+          const currencyStr = (document.getElementById('currency').value || '').toUpperCase().trim();
+          const fullNameStr = (document.getElementById('full_name').value || '').trim();
+
+          const amountRupees = parseFloat(amountRupeesStr);
+          if (!Number.isFinite(amountRupees) || amountRupees <= 0) {
+            setLoading(false);
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = 'Please enter a valid amount in rupees.';
+              errorEl.style.display = 'flex';
+            }
+            return;
+          }
+          if (!/^[A-Z]{3}$/.test(currencyStr)) {
+            setLoading(false);
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = 'Please enter a valid 3-letter currency code.';
+              errorEl.style.display = 'flex';
+            }
+            return;
+          }
+          if (fullNameStr.length < 2) {
+            setLoading(false);
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = 'Please enter your full name.';
+              errorEl.style.display = 'flex';
+            }
+            return;
+          }
+
+          setLoading(true, 'Creating PaymentIntent...');
+
+          const amountPaise = Math.round(amountRupees * 100);
+          const payload = {
+            amount: amountPaise,
+            currency: currencyStr,
+            
+            full_name: fullNameStr
+          };
+
+          let clientSecret;
+          try {
+            const res = await fetch(intentsUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+              },
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data.error || 'Failed to create PaymentIntent');
+            }
+            clientSecret = data.client_secret;
+          } catch (err) {
+            setLoading(false);
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = err.message || 'Failed to create PaymentIntent';
+              errorEl.style.display = 'flex';
+            }
+            return;
+          }
+
+          message.textContent = 'Confirming payment...';
+          let result;
+          try {
+            result = await stripe.confirmCardPayment(clientSecret, {
+              payment_method: {
+                card: card,
+                billing_details: { name: payload.full_name }
+              }
+            });
+          } catch (err) {
+            setLoading(false);
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = err.message || 'Payment failed';
+              errorEl.style.display = 'flex';
+            }
+            return;
+          }
+
+          setLoading(false);
+          const { error, paymentIntent } = result || {};
+          if (error) {
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = error.message || 'Payment failed';
+              errorEl.style.display = 'flex';
+            }
+          } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+            const successMessageText = successEl.querySelector('.message-text');
+            if (successMessageText) {
+              successMessageText.textContent = 'Payment succeeded!';
+              successEl.style.display = 'flex';
+            }
+          } else {
+            const messageText = errorEl.querySelector('.message-text');
+            if (messageText) {
+              messageText.textContent = 'Payment status: ' + (paymentIntent && paymentIntent.status);
+              errorEl.style.display = 'flex';
+            }
           }
         });
-      } catch (err) {
-        setLoading(false);
-        const messageText = errorEl.querySelector('.message-text');
-        if (messageText) {
-          messageText.textContent = err.message || 'Payment failed';
-          errorEl.style.display = 'flex';
-        }
-        return;
-      }
-
-      setLoading(false);
-      const { error, paymentIntent } = result || {};
-      if (error) {
-        const messageText = errorEl.querySelector('.message-text');
-        if (messageText) {
-          messageText.textContent = error.message || 'Payment failed';
-          errorEl.style.display = 'flex';
-        }
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        const successMessageText = successEl.querySelector('.message-text');
-        if (successMessageText) {
-          successMessageText.textContent = 'Payment succeeded!';
-          successEl.style.display = 'flex';
-        }
-      } else {
-        const messageText = errorEl.querySelector('.message-text');
-        if (messageText) {
-          messageText.textContent = 'Payment status: ' + (paymentIntent && paymentIntent.status);
-          errorEl.style.display = 'flex';
-        }
       }
     });
-  });
+
+    // Handle Turbo navigation events and normal loads
+    document.addEventListener('turbo:load', init);
+    document.addEventListener('DOMContentLoaded', init);
+
+    // Unmount before cache to avoid duplicate mounts on back/forward
+    document.addEventListener('turbo:before-cache', function() {
+      if (window.__stripeCard && window.__stripeCard._mounted) {
+        try { window.__stripeCard.unmount(); } catch(_) {}
+        window.__stripeCard._mounted = false;
+      }
+    });
+  })();
 </script>
