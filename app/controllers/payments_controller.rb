@@ -12,7 +12,7 @@ class PaymentsController < ApplicationController
     if amount.blank?
       render json: { error: "amount is required" }, status: :unprocessable_entity
         return
-      end
+    end
 
       begin
       metadata = { full_name: full_name }
