@@ -1,0 +1,240 @@
+<div class="plans-container">
+  <div class="plans-header">
+    <h1>Choose Your Subscription Plan</h1>
+    <p>Select the perfect plan for your needs. All plans include full access to our services.</p>
+  </div>
+
+  <div class="plans-grid">
+    <% @subscription_plans.each do |plan| %>
+      <div class="plan-card">
+        <div class="plan-header">
+          <h3 class="plan-name"><%= plan.name %></h3>
+          <p class="plan-description"><%= plan.description %></p>
+        </div>
+        
+        <div class="plan-price">
+          <div class="price-amount">
+            <span class="currency">₹</span>
+            <span class="amount"><%= sprintf('%.2f', plan.amount_in_currency) %></span>
+          </div>
+          <div class="price-interval">per <%= plan.interval %></div>
+        </div>
+        
+        <div class="plan-details">
+          <div class="detail-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Full access to all features</span>
+          </div>
+          <div class="detail-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>24/7 customer support</span>
+          </div>
+          <div class="detail-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Cancel anytime</span>
+          </div>
+          <div class="detail-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Billing: <%= plan.formatted_interval %></span>
+          </div>
+        </div>
+        
+        <div class="plan-actions">
+          <%= link_to new_subscription_path(plan_id: plan.id), class: "subscribe-btn" do %>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            Subscribe Now
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @subscription_plans.empty? %>
+    <div class="no-plans">
+      <h3>No subscription plans available</h3>
+      <p>Please check back later or contact support for more information.</p>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .plans-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .plans-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .plans-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+
+  .plans-header p {
+    font-size: 1.2rem;
+    color: #6c757d;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .plan-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+  }
+
+  .plan-header {
+    padding: 30px 30px 20px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+  }
+
+  .plan-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+  }
+
+  .plan-description {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .plan-price {
+    padding: 30px;
+    text-align: center;
+    background: #f8f9fa;
+  }
+
+  .price-amount {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .currency {
+    font-size: 1.5rem;
+    color: #6c757d;
+    margin-right: 5px;
+  }
+
+  .amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #28a745;
+  }
+
+  .price-interval {
+    font-size: 1.1rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .plan-details {
+    padding: 30px;
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    color: #495057;
+  }
+
+  .detail-item svg {
+    color: #28a745;
+    flex-shrink: 0;
+  }
+
+  .plan-actions {
+    padding: 0 30px 30px 30px;
+  }
+
+  .subscribe-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .subscribe-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    color: white;
+    text-decoration: none;
+  }
+
+  .no-plans {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+  }
+
+  .no-plans h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #495057;
+  }
+
+  @media (max-width: 768px) {
+    .plans-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .plans-header h1 {
+      font-size: 2rem;
+    }
+
+    .plans-header p {
+      font-size: 1rem;
+    }
+  }
+</style>

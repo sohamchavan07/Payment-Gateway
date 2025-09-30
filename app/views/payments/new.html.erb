@@ -137,7 +137,7 @@
       <input type="hidden" id="stripe-publishable-key" value="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>" />
       <input type="hidden" id="payment-intents-url" value="<%= url_for('/payment_intents') %>" />
       <input type="hidden" id="csrf-token" value="<%= form_authenticity_token %>" />
-      <input type="hidden" id="order_id" value="<%= params[:order_id] %>" />
+     
       <%= csrf_meta_tags %>
     </form>
   </div>
@@ -248,7 +248,7 @@
       const payload = {
         amount: amountPaise,
         currency: currencyStr,
-        order_id: document.getElementById('order_id').value,
+        
         full_name: fullNameStr
       };
 

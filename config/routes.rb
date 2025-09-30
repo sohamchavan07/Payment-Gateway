@@ -16,6 +16,13 @@ Rails.application.routes.draw do
   get "/workshop", to: "workshop#new"
   get "/payments/new", to: "payments#new", as: :new_payment
 
+  # Subscriptions UI
+  get "/subscriptions", to: "subscriptions#index", as: :subscriptions
+  get "/subscriptions/new", to: "subscriptions#new", as: :new_subscription
+
+  # Subscription plans listing UI
+  get "/subscription_plans", to: "subscription_plans#index", as: :subscription_plans
+
   post "/create-checkout-session", to: "payments#create_checkout_session"
   post "/payment_intents", to: "payments#create_payment_intent"
   post "/webhooks/stripe", to: "webhooks#stripe"
@@ -24,7 +31,18 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :checkout do
         post "/create-order", to: "orders#create"
+        post "/confirm-payment", to: "payments#confirm"
       end
+
+      # User cards
+      post "/users/:id/save-card", to: "users/cards#create"
+      get "/users/:id/cards", to: "users/cards#index"
+
+      # Subscriptions
+      post "/subscriptions/create", to: "subscriptions#create"
+
+      # Admin
+      post "/admin/refund", to: "admin/refunds#create"
     end
   end
 end

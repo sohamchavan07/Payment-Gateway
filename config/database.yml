@@ -14,10 +14,10 @@ development:
 
 test:
   <<: *default
-  database: soham_test
-  username: soham
-  password: soham@123
-  host: localhost
+  database: <%= ENV["PGDATABASE"] || "soham_test" %>
+  username: <%= ENV["PGUSER"] || "postgres" %>
+  password: <%= ENV["PGPASSWORD"] || "postgres" %>
+  host: <%= ENV["PGHOST"] || "127.0.0.1" %>
 
 production:
   <<: *default

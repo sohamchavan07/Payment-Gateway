@@ -1,4 +1,129 @@
-<div class="workshop-hero">
+<style>
+  .workshop-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: radial-gradient(120% 120% at -10% -10%, #c0f4ff 0%, #9ad9ff 35%, #8bb6ff 60%, #86a7ff 75%, #7a8cff 100%);
+    color: #0b1220;
+    padding: 28px 24px 24px;
+    box-shadow: 0 20px 40px rgba(20, 35, 90, 0.18);
+  }
+
+  .workshop-hero::after {
+    content: '';
+    position: absolute;
+    right: -80px;
+    bottom: -80px;
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.0) 70%);
+    filter: blur(1px);
+    pointer-events: none;
+  }
+
+  .ws-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #ffd54f;
+    color: #0b1220;
+    font-weight: 800;
+    font-size: 20px;
+    padding: 10px 14px;
+    border-radius: 12px 2px 12px 12px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+  }
+  .ws-badge span {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    opacity: 0.9;
+  }
+
+  .ws-content { max-width: 980px; margin: 0 auto; }
+
+  .ws-brand {
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+  .ws-subbrand { font-weight: 600; opacity: 0.85; font-size: 12px; }
+
+  .ws-title {
+    margin: 12px 0 10px;
+    font-size: clamp(36px, 6vw, 64px);
+    line-height: 1.02;
+    font-weight: 900;
+    color: #0b1220;
+  }
+
+  .ws-strip {
+    display: inline-block;
+    background: #c9ff7a;
+    color: #0b1220;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+  }
+
+  .ws-details {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18px;
+    align-items: end;
+    background: rgba(255,255,255,0.55);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    backdrop-filter: blur(6px);
+  }
+
+  .ws-when-title { font-weight: 800; font-size: 18px; }
+  .ws-when-time { font-weight: 700; opacity: 0.9; }
+
+  .ws-cta { text-align: right; }
+  .ws-pay-btn {
+    display: inline-block;
+    background: #111827;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 800;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(17,24,39,0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  }
+  .ws-pay-btn:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(17,24,39,0.28); background: #0b0f1a; }
+  .ws-note { font-size: 12px; margin-top: 6px; opacity: 0.85; font-weight: 600; }
+
+  .ws-addr {
+    margin: 18px 0 6px;
+    font-weight: 600;
+    opacity: 0.95;
+  }
+
+  .ws-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(12,18,36,0.15);
+    margin-top: 14px;
+    padding-top: 12px;
+    font-weight: 700;
+  }
+  .ws-footer a { color: #0b1220; text-decoration: none; }
+
+  @media (max-width: 640px) {
+    .workshop-hero { padding: 22px 16px; }
+    .ws-details { grid-template-columns: 1fr; text-align: left; }
+    .ws-cta { text-align: left; }
+    .ws-badge { font-size: 18px; top: 12px; right: 12px; }
+  }
+</style>
+
+<div class="workshop-hero" role="region" aria-label="AI Workshop details">
   <div class="ws-badge">₹199 <span>Limited Seats</span></div>
   <div class="ws-content">
     <div class="ws-brand">SUPERHERO<br><span class="ws-subbrand">Design + Code School</span></div>
@@ -27,6 +152,5 @@
     </div>
   </div>
 
-  <div class="ws-robot" aria-hidden="true"></div>
 </div>
 
