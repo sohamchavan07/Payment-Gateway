@@ -21,7 +21,8 @@ class WebhooksController < ApplicationController
       Rails.logger.info "Payment success for session: #{session.id}"
     when "payment_intent.succeeded"
       payment_intent = event.data.object
-      order = Order.find_by(id: payment_intent.metadata&.order_id)
+      order_id = payment_intent.metadata&.[]("order_id")
+      order = Order.find_by(id: order_id)
       if order
         order.update(status: "paid")
       else
@@ -29,7 +30,8 @@ class WebhooksController < ApplicationController
       end
     when "payment_intent.payment_failed"
       payment_intent = event.data.object
-      order = Order.find_by(id: payment_intent.metadata&.order_id)
+      order_id = payment_intent.metadata&.[]("order_id")
+      order = Order.find_by(id: order_id)
       order&.update(status: "failed")
     end
 
