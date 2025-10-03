@@ -23,5 +23,8 @@ module PaymentGateway
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Use SQL structure dumps so we can load the dbdiagram-exported SQL directly
+    config.active_record.schema_format = :sql
   end
 end
